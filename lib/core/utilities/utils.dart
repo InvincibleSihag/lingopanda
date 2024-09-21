@@ -23,7 +23,7 @@ String? validatePassword(String? value) {
 
 
 String getDateFormattedText(DateTime inputTime) {
-    final DateTime now = DateTime.now();
+  final DateTime now = DateTime.now();
   final Duration difference = now.difference(inputTime);
 
   if (difference.inSeconds < 60) {
@@ -37,8 +37,10 @@ String getDateFormattedText(DateTime inputTime) {
   } else if (difference.inDays < 365) {
     final int months = (difference.inDays / 30).floor();
     return '$months month${months == 1 ? '' : 's'} ago';
-  } else {
+  } else if (difference.inDays < 365 * 2) {
     final int years = (difference.inDays / 365).floor();
     return '$years year${years == 1 ? '' : 's'} ago';
+  } else {
+    return 'on ${inputTime.day}/${inputTime.month}/${inputTime.year}';
   }
   }

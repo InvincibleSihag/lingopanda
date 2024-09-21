@@ -1,5 +1,6 @@
 class PlaceholderDescriptions {
-  static const String emailField = 'Enter your Email';
-  static const String passwordField = 'Enter your password';
-  static const String nameField = 'Enter your Name';
+  static const String emailField = 'Email';
+  static const String passwordField = 'Password';
+  static const String nameField = 'Name';
+  static const String appName = 'MyNews';
 }

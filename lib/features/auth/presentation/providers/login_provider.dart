@@ -6,11 +6,13 @@ import 'package:lingopanda/features/auth/domain/repository/auth_repository.dart'
 import '../../../../core/common/models/user.dart';
 
 class LoginProvider with ChangeNotifier {
+  bool isLoading = false;
   final AuthRepository _authRepository;
 
   LoginProvider(this._authRepository);
 
   Future<Either<Failure, UserModel>> signIn(String email, String password) async {
+    setLoading(true);
     return await _authRepository.signIn(email, password);
   }
 
@@ -22,4 +24,8 @@ class LoginProvider with ChangeNotifier {
     await _authRepository.signOut();
   }
 
+  setLoading(bool value) {
+    isLoading = value;
+    notifyListeners();
+  }
 }

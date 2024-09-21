@@ -1,4 +1,7 @@
 import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:lingopanda/core/constants/constants.dart';
+import 'package:lingopanda/core/network/connection_checker.dart';
+import 'package:lingopanda/init_dependencies.dart';
 
 class RemoteConfigService {
   final FirebaseRemoteConfig _remoteConfig;
@@ -9,12 +12,18 @@ class RemoteConfigService {
       minimumFetchInterval: const Duration(seconds: 2),
     ));
     _remoteConfig.setDefaults(const {
-      'country': 'in',
+      countryKey: 'in',
     });
   }
 
   Future<void> initialize() async {
-    await _remoteConfig.fetchAndActivate();
+    try{
+      if(await serviceLocator<ConnectionChecker>().isConnected){
+        await _remoteConfig.fetchAndActivate();
+      }
+    } catch (e) {
+      // print(e);
+    }
   }
 
   String getRemoteConfigValue(String key) {

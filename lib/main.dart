@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Flutter Demo',
+        title: 'Lingo Panda',
         theme: baseTheme,
         home: serviceLocator<AuthRepository>().getCurrentUser() != null ? const NewsPage() : LoginScreen(),
       ),

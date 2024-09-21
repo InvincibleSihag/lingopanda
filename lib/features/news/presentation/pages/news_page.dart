@@ -1,10 +1,17 @@
+import 'dart:developer';
+
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lingopanda/config/color_pallate.dart';
-import 'package:lingopanda/core/utilities/utils.dart';
+import 'package:lingopanda/core/constants/constants.dart';
+import 'package:lingopanda/core/constants/placeholder_descriptions.dart';
+import 'package:lingopanda/core/utilities/snackbar.dart';
+import 'package:lingopanda/features/auth/presentation/pages/login_page.dart';
+import 'package:lingopanda/features/news/presentation/widgets/news_card.dart';
 import 'package:lingopanda/init_dependencies.dart';
 import 'package:lingopanda/services/remote_config.dart';
 import 'package:provider/provider.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lingopanda/features/news/presentation/providers/news_provider.dart';
 
 class NewsPage extends StatefulWidget {
@@ -22,9 +29,14 @@ class NewsPageState extends State<NewsPage> {
   @override
   void initState() {
     super.initState();
-    _newsProvider = Provider.of<NewsProvider>(context, listen: false);
+    _newsProvider = serviceLocator<NewsProvider>();
+    _newsProvider.setOnErrorCallback(_showErrorSnackbar);
     _scrollController = ScrollController();
     _scrollController.addListener(_onScroll);
+  }
+
+  void _showErrorSnackbar(String message) {
+    showSnackBar(context, message);
   }
 
   void _onScroll() {
@@ -32,6 +44,7 @@ class NewsPageState extends State<NewsPage> {
             _scrollController.position.maxScrollExtent - 200 &&
         !_newsProvider.isLoading &&
         _newsProvider.hasMore) {
+      // log("fetching news");
       _newsProvider.fetchNews();
     }
   }
@@ -48,40 +61,40 @@ class NewsPageState extends State<NewsPage> {
       builder: (context, provider, child) {
         if (provider.news.isEmpty) {
           if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+                child: CupertinoActivityIndicator(
+              color: ColorPalette.secondary,
+            ));
           } else {
-            return const Center(child: Text('No news available.'));
+            return const Center(
+                child: Text(
+              'No news available.',
+              style: TextStyle(
+                  fontSize: DisplayConstants.generalFontSize,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.red),
+            ));
           }
         }
 
         return ListView.builder(
-          controller: _scrollController,
+          shrinkWrap: true,
+          primary: false,
           itemCount: provider.hasMore
               ? provider.news.length + 1
               : provider.news.length,
           itemBuilder: (context, index) {
             if (index < provider.news.length) {
               final newsItem = provider.news[index];
-              return ListTile(
-                leading: CachedNetworkImage(
-                  height: 300,
-                  width: 100,
-                  fit: BoxFit.cover,
-                  imageUrl: newsItem.imageUrl,
-                  placeholder: (context, url) =>
-                      const CircularProgressIndicator(),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
-                title: Text(newsItem.title),
-                subtitle: Text(newsItem.description),
-                trailing:
-                    Text(getDateFormattedText(DateTime.parse(newsItem.date))),
-              );
+              return NewsCard(news: newsItem);
             } else {
-              // Display loading indicator at the bottom
               return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 16.0),
-                child: Center(child: CircularProgressIndicator()),
+                padding: EdgeInsets.symmetric(
+                    vertical: DisplayConstants.generalPadding),
+                child: Center(
+                    child: CupertinoActivityIndicator(
+                  color: ColorPalette.secondary,
+                )),
               );
             }
           },
@@ -96,32 +109,63 @@ class NewsPageState extends State<NewsPage> {
       appBar: AppBar(
         centerTitle: false,
         title: const Text(
-          'MyNews',
+          PlaceholderDescriptions.appName,
           style: TextStyle(
               color: ColorPalette.appWhite,
-              fontSize: 20,
+              fontSize: DisplayConstants.generalFontSize,
               fontWeight: FontWeight.bold),
         ),
         actions: [
-          const Padding(
-            padding: EdgeInsets.only(left: 8.0, top: 8.0, bottom: 8.0),
-            child: Icon(
-              Icons.navigation_rounded,
-              color: ColorPalette.appWhite,
-            ),
+          const Icon(CupertinoIcons.location_fill,
+              color: ColorPalette.appWhite),
+          const SizedBox(width: DisplayConstants.generalPadding),
+          Text(
+            serviceLocator<RemoteConfigService>()
+                .getRemoteConfigValue(countryKey)
+                .toUpperCase(),
+            style: const TextStyle(
+                fontSize: DisplayConstants.generalFontSize,
+                fontWeight: FontWeight.bold,
+                color: ColorPalette.appWhite),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 16.0),
-            child: Text(
-              serviceLocator<RemoteConfigService>()
-                  .getRemoteConfigValue("country"),
-              style: const TextStyle(
-                  color: ColorPalette.appWhite, fontWeight: FontWeight.bold),
-            ),
-          ),
+          const SizedBox(width: DisplayConstants.generalPadding),
+          IconButton(
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushAndRemoveUntil(
+                    context, LoginScreen.route(), (route) => false);
+              },
+              icon: const Icon(
+                Icons.logout,
+                color: ColorPalette.appWhite,
+              )),
+          const SizedBox(width: DisplayConstants.generalPadding),
         ],
       ),
-      body: _buildNewsList(),
+      body: SingleChildScrollView(
+        controller: _scrollController,
+        child: Padding(
+          padding: const EdgeInsets.all(DisplayConstants.generalPadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Align(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  'Top Headlines',
+                  style: TextStyle(
+                    fontSize: DisplayConstants.generalFontSize,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+              const SizedBox(height: DisplayConstants.generalPadding),
+              _buildNewsList(),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

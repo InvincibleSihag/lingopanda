@@ -1,10 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:lingopanda/core/common/models/user.dart';
+import 'package:lingopanda/core/constants/error_messages.dart';
 import 'package:lingopanda/core/error/failures.dart';
+import 'package:lingopanda/core/network/connection_checker.dart';
 import 'package:lingopanda/features/auth/domain/repository/auth_repository.dart';
 import 'package:lingopanda/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:lingopanda/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:lingopanda/init_dependencies.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -16,6 +19,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserModel>> signIn(String email, String password) async {
     try {
+      if(!await serviceLocator<ConnectionChecker>().isConnected){
+        return Left(Failure(ErrorMessages.noInternetConnection));
+      }
       final userCredential = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       final userModel = UserModel(
@@ -48,6 +54,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, UserModel>> signUp(String email, String name, String password) async {
     try {
+      if(!await serviceLocator<ConnectionChecker>().isConnected){
+        return Left(Failure(ErrorMessages.noInternetConnection));
+      }
       final userCredential = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       await userCredential.user!.updateDisplayName(name);
