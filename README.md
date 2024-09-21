@@ -75,7 +75,7 @@ To get started with App, follow these steps:
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/lingopanda.git
+    git clone https://github.com/InvincibleSihag/lingopanda.git
     cd lingopanda
     ```
 
