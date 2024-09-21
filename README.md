@@ -22,8 +22,9 @@
 - Responsive and adaptive UI
 
 ## Architecture
+![Architecture](architecture-diagram.png)
 
-LingoPanda follows a clean architecture approach, ensuring separation of concerns and scalability. The architecture is divided into three main layers:
+This project follows a clean architecture approach, ensuring separation of concerns and scalability. The architecture is divided into three main layers:
 
 1. **Presentation Layer**: Contains the UI components and state management.
 2. **Domain Layer**: Contains business logic and domain entities.
@@ -70,7 +71,7 @@ Key components:
 
 ## Getting Started
 
-To get started with LingoPanda, follow these steps:
+To get started with App, follow these steps:
 
 1. **Clone the repository**:
     ```bash
@@ -95,3 +96,19 @@ To get started with LingoPanda, follow these steps:
 ## Project Structure
 
 The project is organized as follows:
+
+- `lib/`: Contains the main application code.
+  - `features/`: Contains the features of the app.
+  - `core/`: Contains the core components of the app.
+  - `presentation/`: Contains the UI components and state management.
+  - `domain/`: Contains the business logic and domain entities.
+  - `data/`: Contains the data fetching, caching, and storage.
+
+## Technical Details
+
+- **State Management**: Uses the `Provider` package for state management.
+- **Remote Configuration**: Uses Firebase Remote Config for dynamic configuration.
+- **Local Storage**: Uses Hive for local storage.
+- **Data Fetching**: Uses Dio for data fetching.
+- **Authentication**: Uses Firebase Auth for authentication.
+
