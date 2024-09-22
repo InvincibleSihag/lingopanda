@@ -12,7 +12,7 @@ class NewsProvider with ChangeNotifier {
 
   final NewsRepository _newsRepository;
   final int _limit = 10;
-  int _page = 0;
+  int _page = 1;
   bool _isLoading = false;
   bool _hasMore = true;
   void Function(String)? _onError;
@@ -40,15 +40,19 @@ class NewsProvider with ChangeNotifier {
           _isLoading = false;
           notifyListeners();
           _onError?.call(failure.message);
+          // return;
         },
         (newsList) {
           if (newsList.length < _limit) {
             _hasMore = false;
           }
-          _news.addAll(newsList.where((element) => (element.title.isNotEmpty && element.description.isNotEmpty && element.title.trim().toLowerCase() != "[removed]")));
+          _news.addAll(newsList.where((element) => (element.title.isNotEmpty &&
+              element.description.isNotEmpty &&
+              element.title.trim().toLowerCase() != "[removed]")));
           _page++;
           _isLoading = false;
           notifyListeners();
+          return;
         },
       );
     });

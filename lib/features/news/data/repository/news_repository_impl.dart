@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:fpdart/fpdart.dart';
 import 'package:lingopanda/core/error/failures.dart';
 import 'package:lingopanda/features/news/data/datasources/news_local_datasource.dart';
@@ -23,6 +25,7 @@ class NewsRepositoryImpl implements NewsRepository {
       newsLocalDataSource.saveNews(news);
       fetchedNews = true;
       yield right(news);
+      log("News fetched from remote $page");
       return;
     } catch (e) {
       final localNews = newsLocalDataSource.getNews();

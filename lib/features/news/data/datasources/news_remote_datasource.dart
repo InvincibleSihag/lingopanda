@@ -40,6 +40,8 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
           'pageSize': limit,
         },
       );
+      // log(response.realUri.toString());
+      // log("page: $page , limit: $limit");
       // log(response.data.toString());
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data['articles'];
@@ -56,8 +58,8 @@ class NewsRemoteDataSourceImpl implements NewsRemoteDataSource {
                 ))
             .toList();
         for (NewsServerModel ne in news) {
-          log(ne.toString());
-          log("\n");
+          // log(ne.toString());
+          // log("\n");
         }
         return news;
       }

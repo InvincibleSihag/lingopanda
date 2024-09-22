@@ -44,3 +44,8 @@ String getDateFormattedText(DateTime inputTime) {
     return 'on ${inputTime.day}/${inputTime.month}/${inputTime.year}';
   }
   }
+
+
+  bool Function(int, int) compactionStrategy = (int entries, int deletedEntries) {
+    return entries > 30;
+  };

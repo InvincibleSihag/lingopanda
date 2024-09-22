@@ -7,6 +7,7 @@ import 'package:internet_connection_checker_plus/internet_connection_checker_plu
 import 'package:lingopanda/core/common/models/user.dart';
 import 'package:lingopanda/core/constants/constants.dart';
 import 'package:lingopanda/core/network/connection_checker.dart';
+import 'package:lingopanda/core/utilities/utils.dart';
 import 'package:lingopanda/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:lingopanda/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:lingopanda/features/auth/data/repository/auth_repository_impl.dart';
@@ -26,11 +27,12 @@ final serviceLocator = GetIt.instance;
 initDependencies() async {
 
   // Registering Hive dependencies
+  // Apply compaction strategy to Hive boxes
   await Hive.initFlutter();
   Hive.registerAdapter(UserModelAdapter());
   Hive.registerAdapter(NewsServerModelAdapter());
-  await Hive.openBox<NewsServerModel>(HiveConstants.newsBox);
-  await Hive.openBox<UserModel>(HiveConstants.userBox);
+  await Hive.openBox<NewsServerModel>(HiveConstants.newsBox, compactionStrategy: compactionStrategy);
+  await Hive.openBox<UserModel>(HiveConstants.userBox, compactionStrategy: compactionStrategy);
 
   // Registering Remote Config dependencies
   serviceLocator.registerLazySingleton<Dio>(() => Dio());
